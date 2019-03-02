@@ -9,21 +9,26 @@ h1 { font-weight: bold; font-size: 25pt; }
 h2 { font-weight: bold; font-size: 15pt; }
 button { font-weight: bold; font-size: 15pt; }
 </style>
-<script src="gamelogic.js"></script>
+
 </head>
 
-<body>
+<body style="background-image: url(https://www.ieee.org/content/dam/ieee-org/ieee/web/org/globals/88857-22.gif); background-repeat: no-repeat;">
 <center>
 <p>
-<h1>PHPoC - Web-based Game</h1>
+<h1>IoT Game by <a href="http://ieeeucsd.org/">IEEE UCSD</a></h1>
 </p>
 <canvas id="remote" width="400" height="500"></canvas>
 <h2>
 <p>
 WebSocket : <span id="ws_state">null</span>
 </p>
-<button id="bt_connect" type="button" onclick="connect_onclick();">Connect</button>
+
+Address: <input type="text" name="address" id="address" text="192.168.43.241:5000">
+<button id="bt_connect" type="button">Connect</button>
+
 </h2>
+
 </center>
+<script src="gamelogic.js"></script>
 </body>
 </html>
