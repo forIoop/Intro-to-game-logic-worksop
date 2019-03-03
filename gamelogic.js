@@ -1,14 +1,3 @@
-/*
-* Name: IEEE tech committee
-*
-* File: gamelogic.js
-*
-* Description: program contains the logic of our two player pong
-  game using javascript. The below functions include how the pong
-  objects and variables interact through collisions, movement, and
-  animations.
-*/
-
 window.requestAnimFrame = (function(callback) {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
     function(callback) {
@@ -16,69 +5,93 @@ window.requestAnimFrame = (function(callback) {
     };
 })();
 
+// width/height of the whole canvas
 var cvs_width = 400, cvs_height = 500;
-var ball = {x:cvs_width / 2, y:cvs_height / 2 , radius:20, dir_x:1, dir_y:1, speed:3};
+
+// dctionary representing the properties of the ball
+var ball = {
+  x:cvs_width / 2, // center of the ball
+  y:cvs_height / 2 , // center of the ball
+  radius:20,
+  dir_x:1,
+  dir_y:1,
+  speed:3 // we can increase this value for it to go faster
+};
+
 var obs_1 = {
-    x:      100,
-    y:      150,
-    left:   0, // update later
-    right:  0, // update later
-    top:    0, // update later
-    bottom: 0, // update later
+    x:      100, // represents x-coord center of the obstacle
+    y:      150, // represents y-coord center of the obstacle
+    left:   0, // updated in the init function
+    right:  0, // updated in the init function
+    top:    0, // updated in the init function
+    bottom: 0, // updated in the init function
     width:  105,
     height: 30,
-    dir:    1, // up down direction
-    speed:  2
+    dir:    1, // up/down direction
+    speed:  2 // we can increase this for the obstacles to move faster
     };
+
 var obs_2 = {
-    x:      300,
-    y:      350,
-    left:   0, // update later
-    right:  0, // update later
-    top:    0, // update later
-    bottom: 0, // update later
+    x:      300,  // represents x-coord center of the obstacle
+    y:      350, // represents y-coord center of the obstacle
+    left:   0, // updated in the init function
+    right:  0, // updated in the init function
+    top:    0, // updated in the init function
+    bottom: 0, // updated in the init function
     width:  105,
     height: 30,
     dir:    -1, // up down direction
-    speed:  2
+    speed:  2 // we can increase this for the obstacles to move faster
     };
+
+// array of obstacles
 var obstacles = [obs_1, obs_2];
+
+
 var keeper_1 = {
-    x:      cvs_width / 2,
-    y:      15,
-    left:   0, // update later
-    right:  0, // update later
-    top:    0, // update later
-    bottom: 0, // update later
+    x:      cvs_width/2, //x-coord center
+    y:      15, // y-coord center
+    left:   0, // update later in init
+    right:  0, // update later in init
+    top:    0, // update later in init
+    bottom: 0, // update later in init
     width:  105,
     height: 30,
-    dir:    0, // left right direction
-    speed:  8
+    dir:    0, // left-right direction
+    speed:  8 // we can increase this to move faster
     };
 var keeper_2 = {
-    x:      cvs_width / 2,
-    y:      cvs_height - 15,
-    left:   0, // update later
-    right:  0, // update later
-    top:    0, // update later
-    bottom: 0, // update later
+    x:      cvs_width / 2, //x-coord center
+    y:      cvs_height - 15, gamelogic//y-coord center
+    left:   0, // update later in init
+    right:  0, // update later in init
+    top:    0, // update later in init
+    bottom: 0, // update later in init
     width:  105,
     height: 30,
     dir:    0, // left right direction
-    speed:  8
+    speed:  8 // we can increase this to move faster
     };
+
+// array of keepers
 var keepers = [keeper_1, keeper_2];
+
+// array representing the score of both players
 var score = [0, 0];
+
+// how long we must wait before the game starts
 var delay = 100;
 
-var ws = null;
+var ws = 1;
 var ctx = null;
 
+// called once when the page is loaded
 function init()
 {
     var width = window.innerWidth;
     var height = window.innerHeight;
 
+    // determines a ratio multiplier based on the size of the browser windwo
     var ratio_x = (width - 105) / (cvs_width);
     var ratio_y = (height - 200) / cvs_height;
     var ratio = (ratio_x < ratio_y) ? ratio_x : ratio_y;
@@ -93,6 +106,8 @@ function init()
     ctx = canvas.getContext("2d");
     ctx.translate(105, 0);
     ctx.lineWidth = 4;
+
+    // scales the size of all objects based on the ration found previously
 
     for( var i = 0; i < obstacles.length; i++)
     {
@@ -127,46 +142,11 @@ function init()
 
     update_view(ctx);
 }
-function connect_onclick()
-{
-    if(ws == null)
-    {
-        var ws_host_addr = "<?echo _SERVER("HTTP_HOST")?>";
-        ws = new WebSocket("ws://" + ws_host_addr + "/game", "text.phpoc");
-        document.getElementById("ws_state").innerHTML = "CONNECTING";
-        ws.onopen = ws_onopen;
-        ws.onclose = ws_onclose;
-        ws.onmessage = ws_onmessage;
-    }
-    else
-        ws.close();
-}
-function ws_onopen()
-{
-    document.getElementById("ws_state").innerHTML = "<font color='blue'>CONNECTED</font>";
-    document.getElementById("bt_connect").innerHTML = "Disconnect";
-    ws.send("dummy\r\n");
-}
-function ws_onclose()
-{
-    document.getElementById("ws_state").innerHTML = "<font color='gray'>CLOSED</font>";
-    document.getElementById("bt_connect").innerHTML = "Connect";
-    ws.onopen = null;
-    ws.onclose = null;
-    ws.onmessage = null;
-    ws = null;
-}
-function ws_onmessage(e_msg)
-{
-    e_msg = e_msg || window.event; // MessageEvent
 
-    console.log(e_msg.data);
-    var arr = JSON.parse(e_msg.data);
-    keepers[0].dir = parseInt(arr[0]);
-    keepers[1].dir = parseInt(arr[1]);
-}
+// shows the actual visuals
 function update_view(ctx)
 {
+
     ctx.clearRect(-105, 0, cvs_width, cvs_height);
 
     ctx.fillStyle = "black";
@@ -200,93 +180,174 @@ function update_view(ctx)
     ctx.fillStyle="#0000FF";
     ctx.fillRect(keeper_2.left, keeper_2.top, keeper_2.width, keeper_2.height);
 }
-function collision_detect(object) {
-/* the purpose of this function is to compare ball.x and ball.y
-   to the position of our pong object.
-   We also must compare the x,y distance the ball is to the touch
-   distance of the ball
-   (Hint: simple conditionals would work!) */
 
-    /* local distance variables initalized here */
+/*
+  This function is called continuously to move t he ball based on its
+  dir_x, dir_y, and speed property.
+  In order to move the ball, we must alter ball.x and ball.y
+ */
+function move_ball()
+{
+  //# TODO:
+}
+
+/*
+  This function is used to move the keepers based on its dir value.
+  These keepers will be controlled by the keyboard (for now).
+  The keyboardEvents are already done. The purpose of this method is only
+  to get the keepers to actually move. Consider what will happen if the
+  kepper touches either edge.
+*/
+function move_keepers()
+{
+  // TODO:
+}
+
+/*
+   This function runs through the obstacle objects, making them
+   move up and down continously. We have the array, obstacles, which
+   is the list containing the two obstacles in our game.
+ */
+function move_obstacles()
+{
+  // this constant represents how close from the top and bottom edge
+  // the obstacle is allowed to go until it needs to switch direction
+  var AMPLITUDE = 8*ball.radius;
+
+  //# TODO:
+}
+
+/*
+  This function is used to determine whether the ball is touching the object
+  and what to do if the ball and object are "touching".
+  The param, object, will represent either an individual keeper or obstacle.
+ */
+function collision_detect(object)
+{
+    // distance between center of the ball and center of the object
     var dist_x = Math.abs(ball.x - object.x);
     var dist_y = Math.abs(ball.y - object.y);
+
+    // distance between center of the ball and object that determines the two are "touching"
     var TOUCH_DIST_X = ball.radius + object.width / 2;
     var TOUCH_DIST_Y = ball.radius + object.height / 2;
 
-
-    //#TODO
-
-
-}
-function check_edges() {
-/* this function accounts for the edges of our canvas,
-think about our cvs_width and cvs_height. What might need
-to happen so the ball stays on the grid and the store increments */
-/*(Hint: Think about the boundaries of our play canvis, how do we make
-   the ball stay on the grid when a collision occurs) */
-
-//#TODO
-
-}
-function check_keepers() {
-/* This function runs through all of our keeper objects,
-checking each one if it had a collision with the ball */
-// (Hint: remember your keepers objects are stored in an array)
-
-//#TODO
-
-}
-function check_obstacles() {
-/* This function runs through all of our obstacle objects,
-   checking each one if it had a collision with the ball */
-// (Hint: very similiar logic to our check_keepers function)
-
-//#TODO
-
-}
-function move_ball() {
-/* This function moves our ball based on its x,y componenet direction
-along with the speed of the ball */
-// (Hint: very simple function that includes ball.x and ball.y)
-
-//#TODO
-
-}
-function move_obstacles() {
-/* This function runs through the obstacle objects, making them
-   move left and right continously */
-/* (Hint: This is more complex, try to counter the change in direction of our obstacles
-    if the initial direction == 1 or -1) */
-
-//#TODO
-
+    // TODO:
 }
 
-function move_keepers() {
-/* this function runs through the keepers objects and assigns them
-movement values. Remember that your keeper should stop when it gets to
-cvs_width */
-/* (Hint: remember to make a keepers[i].left and keepers[i].right statement
-and set it equal to the distance traveled - the keeper width/2) */
-
-// #TODO
-
+/*
+  This function is used to check whether the ball is touching the keepers and What
+  to do if it is. Remember, we have already done the logic to this in collision_detect,
+  so we can use that method on all of the keepers.
+ */
+function check_keepers()
+{
+    // TODO:
 }
-function animate(ctx) {
-/* This function puts all your above functions together to make the game!
-think about what would happen if no user input was made. What are the only
-things moving in this scenario?
-(Hint: your !delay conditional would initiate the movements to start your game,
- what are the functions that you need to call to make the game functional? ) */
 
+
+/*
+  This function is used to check whether the ball is touching the obstacles and what
+  to do if it is. Remember, we have already done the logic to this in collision_detect,
+  so we can use that method on all of the obstacles.
+*/
+function check_obstacles()
+{
+    // TODO:
+}
+
+/*
+  This function is used to check whether the ball is touching the edges of the
+  canvas, and what to do if it is. Think about what should happen when the ball
+  is touching the sides and what should happen when the ball touches the top or
+  bottom.
+ */
+function check_edges()
+{
+    // TODO:
+}
+
+
+
+// deals with keyboard events
+
+var tickX = 10;
+var tickY = 10;
+
+var keyW = false;
+var keyA = false;
+var keyS = false;
+var keyD = false;
+
+
+function setKey(e) {
+  e = e || window.event;
+  switch (e.keyCode) {
+    case 68: //d
+      keyD = true;
+      break;
+    case 37: //leftArrow
+      keyS = true;
+      break;
+    case 65: //a
+      keyA = true;
+      break;
+    case 39: //rightArrow
+      keyW = true;
+      break;
+    }
+}
+
+function clearKey(e) {
+  e = e || window.event;
+  switch (e.keyCode) {
+    case 68: //d
+      keyD = false;
+      break;
+    case 37: //s
+      keyS = false;
+      break;
+    case 65: //a
+      keyA = false;
+      break;
+    case 39: //w
+      keyW = false;
+      break;
+    }
+}
+function keyboardInput() {
+
+    keepers[0].dir = keyD ? 1
+                    : keyA ? -1
+                    : 0;
+    keepers[1].dir = keyW ? 1
+                    : keyS ? -1
+                    : 0;
+}
+
+
+// animates the graphics for the game
+function animate(ctx)
+{
     if(ws != null)
     {
+        document.onkeydown = setKey;
+        document.onkeyup = clearKey;
 
-    //#TODO
+        keyboardInput();
+        move_keepers();
+
+
+
 
         if(!delay)
         {
-            //#TODO
+            move_ball();
+            move_obstacles();
+            check_edges();
+            check_keepers();
+            check_obstacles();
+
         }
         else
             delay--;
@@ -300,7 +361,8 @@ things moving in this scenario?
     });
 }
 
-setTimeout(function() {
+// used to allow 100 miliseconds for the graphics to load for the game, then starts animating
+setTimeout(functi);on() {
     animate(ctx);
 }, 100);
 
