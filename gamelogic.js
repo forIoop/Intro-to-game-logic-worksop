@@ -15,7 +15,7 @@ var ball = {
   radius:20,
   dir_x:1,
   dir_y:1,
-  speed:3 // we can increase this value for it to go faster
+  speed:5 // we can increase this value for it to go faster
 };
 
 var obs_1 = {
