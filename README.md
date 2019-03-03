@@ -16,3 +16,4 @@ through javascript by creating a two player pong game.
 ##Acknowledgements
 
 * Arduino website for providing us with the documentation for the game
+* Curtis R. Lee for providing u with the iot website
