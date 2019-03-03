@@ -221,7 +221,7 @@ function move_obstacles()
   This function is used to determine whether the ball is touching the object
   and what to do if the ball and object are "touching".
   The param, object, will represent either an individual keeper or obstacle.
- */
+ */);
 function collision_detect(object)
 {
     // distance between center of the ball and center of the object
@@ -326,39 +326,36 @@ function keyboardInput() {
 }
 
 
-// animates the graphics for the game
+// infinitely recursive method that is called to animate the game's visuals
 function animate(ctx)
 {
-    if(ws != null)
-    {
-        document.onkeydown = setKey;
-        document.onkeyup = clearKey;
 
-        keyboardInput();
-        move_keepers();
+  document.onkeydown = setKey;
+  document.onkeyup = clearKey;
+  keyboardInput();
+
+  // checks if delay is NOT zero
+  if(!delay)
+  {
+      move_ball();
+      move_obstacles();
+      move_keepers();
+      check_edges();
+      check_keepers();
+      check_obstacles();
+
+  }
+  else
+    // decreases delay, which is the time before the game starts
+      delay--;
+
+  update_view(ctx);
 
 
-
-
-        if(!delay)
-        {
-            move_ball();
-            move_obstacles();
-            check_edges();
-            check_keepers();
-            check_obstacles();
-
-        }
-        else
-            delay--;
-
-        update_view(ctx);
-    }
-
-    // request new frame
-    requestAnimFrame(function() {
-        animate(ctx);
-    });
+  // request new frame
+  requestAnimFrame(function() {
+      animate(ctx);
+  });
 }
 
 // used to allow 100 miliseconds for the graphics to load for the game, then starts animating
