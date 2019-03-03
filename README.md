@@ -1,4 +1,4 @@
-# Intro-to-game-logic-worksop
+# Intro-to-game-logic-workshop
 
 * This workshop is designed to educate participants on basic game logic
 through javascript by creating a two player pong game.
