@@ -62,7 +62,7 @@ var keeper_1 = {
     };
 var keeper_2 = {
     x:      cvs_width / 2, //x-coord center
-    y:      cvs_height - 15, gamelogic//y-coord center
+    y:      cvs_height - 15, //y-coord center
     left:   0, // update later in init
     right:  0, // update later in init
     top:    0, // update later in init
@@ -182,7 +182,7 @@ function update_view(ctx)
 }
 
 /*
-  This function is called continuously to move t he ball based on its
+  This function is called continuously to move t he ball based on its
   dir_x, dir_y, and speed property.
   In order to move the ball, we must alter ball.x and ball.y
  */
@@ -221,7 +221,7 @@ function move_obstacles()
   This function is used to determine whether the ball is touching the object
   and what to do if the ball and object are "touching".
   The param, object, will represent either an individual keeper or obstacle.
- */);
+ */
 function collision_detect(object)
 {
     // distance between center of the ball and center of the object
@@ -359,7 +359,7 @@ function animate(ctx)
 }
 
 // used to allow 100 miliseconds for the graphics to load for the game, then starts animating
-setTimeout(functi);on() {
+setTimeout(function() {
     animate(ctx);
 }, 100);
 
