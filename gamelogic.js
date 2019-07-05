@@ -4,111 +4,77 @@ window.requestAnimFrame = (function(callback) {
         window.setTimeout(callback, 1000 / 60);
     };
 })();
-
-// width/height of the whole canvas
 var cvs_width = 400, cvs_height = 500;
-
-// dctionary representing the properties of the ball
-var ball = {
-  x:cvs_width / 2, // center of the ball
-  y:cvs_height / 2 , // center of the ball
-  radius:20,
-  dir_x:1,
-  dir_y:1,
-  speed:5 // we can increase this value for it to go faster
-};
-
+var ball = {x:cvs_width / 2, y:cvs_height / 2 , radius:20, dir_x:1, dir_y:1, speed:5};
 var obs_1 = {
-    x:      100, // represents x-coord center of the obstacle
-    y:      150, // represents y-coord center of the obstacle
-    left:   0, // updated in the init function
-    right:  0, // updated in the init function
-    top:    0, // updated in the init function
-    bottom: 0, // updated in the init function
+    x:      100,
+    y:      150,
+    left:   0, // update later
+    right:  0, // update later
+    top:    0, // update later
+    bottom: 0, // update later
     width:  105,
     height: 30,
-    dir:    1, // up/down direction
-    speed:  2 // we can increase this for the obstacles to move faster
+    dir:    1, // up down direction
+    speed:  2
     };
-
 var obs_2 = {
-    x:      300,  // represents x-coord center of the obstacle
-    y:      350, // represents y-coord center of the obstacle
-    left:   0, // updated in the init function
-    right:  0, // updated in the init function
-    top:    0, // updated in the init function
-    bottom: 0, // updated in the init function
+    x:      300,
+    y:      350,
+    left:   0, // update later
+    right:  0, // update later
+    top:    0, // update later
+    bottom: 0, // update later
     width:  105,
     height: 30,
     dir:    -1, // up down direction
-    speed:  2 // we can increase this for the obstacles to move faster
+    speed:  2
     };
-
-// array of obstacles
 var obstacles = [obs_1, obs_2];
-
-
 var keeper_1 = {
-    x:      cvs_width/2, //x-coord center
-    y:      15, // y-coord center
-    left:   0, // update later in init
-    right:  0, // update later in init
-    top:    0, // update later in init
-    bottom: 0, // update later in init
-    width:  105,
-    height: 30,
-    dir:    0, // left-right direction
-    speed:  8 // we can increase this to move faster
-    };
-var keeper_2 = {
-    x:      cvs_width / 2, //x-coord center
-    y:      cvs_height - 15, //y-coord center
-    left:   0, // update later in init
-    right:  0, // update later in init
-    top:    0, // update later in init
-    bottom: 0, // update later in init
+    x:      cvs_width/2,
+    y:      15,
+    left:   0, // update later
+    right:  0, // update later
+    top:    0, // update later
+    bottom: 0, // update later
     width:  105,
     height: 30,
     dir:    0, // left right direction
-    speed:  8 // we can increase this to move faster
+    speed:  8
     };
-
-// array of keepers
+var keeper_2 = {
+    x:      cvs_width / 2,
+    y:      cvs_height - 15,
+    left:   0, // update later
+    right:  0, // update later
+    top:    0, // update later
+    bottom: 0, // update later
+    width:  105,
+    height: 30,
+    dir:    0, // left right direction
+    speed:  8
+    };
 var keepers = [keeper_1, keeper_2];
-
-// array representing the score of both players
 var score = [0, 0];
-
-// how long we must wait before the game starts
 var delay = 100;
-
 var ws = 1;
 var ctx = null;
-
-// called once when the page is loaded
 function init()
 {
     var width = window.innerWidth;
     var height = window.innerHeight;
-
-    // determines a ratio multiplier based on the size of the browser windwo
     var ratio_x = (width - 105) / (cvs_width);
     var ratio_y = (height - 200) / cvs_height;
     var ratio = (ratio_x < ratio_y) ? ratio_x : ratio_y;
-
     cvs_width *= ratio;
     cvs_height *= ratio;
-
     var canvas = document.getElementById("remote");
     canvas.width = cvs_width + 105;
     canvas.height = cvs_height;
-
     ctx = canvas.getContext("2d");
     ctx.translate(105, 0);
     ctx.lineWidth = 4;
-
-    // scales the size of all objects based on the ration found previously
-
     for( var i = 0; i < obstacles.length; i++)
     {
         obstacles[i].x *= ratio;
@@ -121,7 +87,6 @@ function init()
         obstacles[i].top = obstacles[i].y - obstacles[i].height / 2;
         obstacles[i].bottom = obstacles[i].y + obstacles[i].height / 2;
     }
-
     for( var i = 0; i < keepers.length; i++)
     {
         keepers[i].x *= ratio;
@@ -134,24 +99,17 @@ function init()
         keepers[i].top = keepers[i].y - keepers[i].height / 2;
         keepers[i].bottom = keepers[i].y + keepers[i].height / 2;
     }
-
     ball.x *= ratio;
     ball.y *= ratio;
     ball.radius *= ratio;
     ball.speed *= ratio;
-
     update_view(ctx);
 }
-
-// shows the actual visuals
 function update_view(ctx)
 {
-
     ctx.clearRect(-105, 0, cvs_width, cvs_height);
-
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, cvs_width, cvs_height);
-
     ctx.beginPath();
     ctx.moveTo(-105, cvs_height / 2);
     ctx.lineTo(0, cvs_height / 2);
@@ -165,121 +123,141 @@ function update_view(ctx)
     ctx.fillText(team_1.toString(), -50, cvs_height / 2 - 70);
     ctx.fillStyle = "#0000FF";
     ctx.fillText(team_2.toString(), -50, cvs_height / 2 + 50);
-
     ctx.fillStyle="#FF0000";
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, ball.radius, 0, 2*Math.PI);
     ctx.fill();
-
     for( var i = 0; i < obstacles.length; i++)
         ctx.fillRect(obstacles[i].left, obstacles[i].top, obstacles[i].width, obstacles[i].height);
-
     ctx.fillStyle="#00FF00";
     ctx.fillRect(keeper_1.left, keeper_1.top, keeper_1.width, keeper_1.height);
-
     ctx.fillStyle="#0000FF";
     ctx.fillRect(keeper_2.left, keeper_2.top, keeper_2.width, keeper_2.height);
 }
-
-/*
-  This function is called continuously to move t he ball based on its
-  dir_x, dir_y, and speed property.
-  In order to move the ball, we must alter ball.x and ball.y
- */
-function move_ball()
-{
-  //# TODO:
-}
-
-/*
-  This function is used to move the keepers based on its dir value.
-  These keepers will be controlled by the keyboard (for now).
-  The keyboardEvents are already done. The purpose of this method is only
-  to get the keepers to actually move. Consider what will happen if the
-  kepper touches either edge.
-*/
-function move_keepers()
-{
-  // TODO:
-}
-
-/*
-   This function runs through the obstacle objects, making them
-   move up and down continously. We have the array, obstacles, which
-   is the list containing the two obstacles in our game.
- */
-function move_obstacles()
-{
-  // this constant represents how close from the top and bottom edge
-  // the obstacle is allowed to go until it needs to switch direction
-  var AMPLITUDE = 8*ball.radius;
-
-  //# TODO:
-}
-
-/*
-  This function is used to determine whether the ball is touching the object
-  and what to do if the ball and object are "touching".
-  The param, object, will represent either an individual keeper or obstacle.
- */
 function collision_detect(object)
 {
-    // distance between center of the ball and center of the object
     var dist_x = Math.abs(ball.x - object.x);
     var dist_y = Math.abs(ball.y - object.y);
-
-    // distance between center of the ball and object that determines the two are "touching"
     var TOUCH_DIST_X = ball.radius + object.width / 2;
     var TOUCH_DIST_Y = ball.radius + object.height / 2;
-
-    // TODO:
+    if(ball.x >= object.left && ball.x <= object.right)
+    {
+        if(dist_y <= TOUCH_DIST_Y)
+        {
+            ball.dir_y *= -1;
+            if(ball.y < object.top)
+                ball.y = object.top - ball.radius;
+            else if(ball.y > object.bottom)
+                ball.y = object.bottom + ball.radius;
+            return true;
+        }
+        return false;
+    }
+    if(ball.y >= object.top && ball.y <= object.bottom)
+    {
+        if(dist_x <= TOUCH_DIST_X)
+        {
+            ball.dir_x *= -1;
+            if(ball.x < object.left)
+                ball.x = object.left - ball.radius;
+            else if(ball.x > object.right)
+                ball.x = object.right + ball.radius;
+            return true;
+        }
+        return false;
+    }
+    if(dist_x < TOUCH_DIST_X && dist_y < TOUCH_DIST_Y)
+    {
+        dist_x -= object.width / 2; //distance to corner
+        dist_y -= object.height / 2; //distance to corner
+        if(dist_x == dist_y)
+        {
+            ball.dir_x *= -1;
+            ball.dir_y *= -1;
+        }
+        else if(dist_x > dist_y)
+            ball.dir_x *= -1;
+        else
+            ball.dir_y *= -1;
+        return true;
+    }
 }
-
-/*
-  This function is used to check whether the ball is touching the keepers and What
-  to do if it is. Remember, we have already done the logic to this in collision_detect,
-  so we can use that method on all of the keepers.
- */
-function check_keepers()
-{
-    // TODO:
-}
-
-
-/*
-  This function is used to check whether the ball is touching the obstacles and what
-  to do if it is. Remember, we have already done the logic to this in collision_detect,
-  so we can use that method on all of the obstacles.
-*/
-function check_obstacles()
-{
-    // TODO:
-}
-
-/*
-  This function is used to check whether the ball is touching the edges of the
-  canvas, and what to do if it is. Think about what should happen when the ball
-  is touching the sides and what should happen when the ball touches the top or
-  bottom.
- */
 function check_edges()
 {
-    // TODO:
+    if((ball.x + ball.radius) >= cvs_width || (ball.x - ball.radius) <= 0)
+        ball.dir_x *= -1;
+    if((ball.y - ball.radius) >= cvs_height || (ball.y + ball.radius) <= 0)
+    {
+        if((ball.y - ball.radius) >= cvs_height)
+            score[0] += 1;
+        else
+            score[1] += 1;
+        ball.dir_y *= -1;
+        ball.x = cvs_width / 2;
+        ball.y = cvs_height / 2;
+        delay = 100;
+    }
 }
-
-
-
-// deals with keyboard events
-
+function check_keepers()
+{
+    for( var i = 0; i < keepers.length; i++)
+    {
+        var obs = keepers[i];
+        collision_detect(obs);
+    }
+}
+function check_obstacles()
+{
+    for( var i = 0; i < obstacles.length; i++)
+    {
+        var obs = obstacles[i];
+        collision_detect(obs);
+    }
+}
+function move_ball()
+{
+    ball.x += ball.dir_x * ball.speed;
+    ball.y += ball.dir_y * ball.speed;
+}
+function move_obstacles()
+{
+    var AMPLITUDE = 8*ball.radius;
+    for( var i = 0; i < obstacles.length; i++)
+    {
+        obstacles[i].y += obstacles[i].dir * obstacles[i].speed;
+        if(obstacles[i].dir == 1 && obstacles[i].y > (cvs_height - AMPLITUDE))
+            obstacles[i].dir = -1;
+        else if(obstacles[i].dir == -1 && obstacles[i].y < (AMPLITUDE))
+            obstacles[i].dir = 1;
+        obstacles[i].top = obstacles[i].y - obstacles[i].height / 2;
+        obstacles[i].bottom = obstacles[i].y + obstacles[i].height / 2;
+    }
+}
+function move_keepers()
+{
+    for( var i = 0; i < keepers.length; i++)
+    {
+        keepers[i].x += keepers[i].dir*keepers[i].speed;
+        if(keepers[i].right > cvs_width && keepers[i].dir == 1)
+        {
+            keepers[i].dir *= 0;
+            keepers[i].x = cvs_width - keepers[i].width / 2
+        }
+        if(keepers[i].left < 0 && keepers[i].dir == -1)
+        {
+            keepers[i].dir = 0;
+            keepers[i].x = keepers[i].width / 2
+        }
+        keepers[i].left = keepers[i].x - keepers[i].width / 2;
+        keepers[i].right = keepers[i].x + keepers[i].width / 2;
+    }
+}
 var tickX = 10;
 var tickY = 10;
-
 var keyW = false;
 var keyA = false;
 var keyS = false;
 var keyD = false;
-
-
 function setKey(e) {
   e = e || window.event;
   switch (e.keyCode) {
@@ -297,7 +275,6 @@ function setKey(e) {
       break;
     }
 }
-
 function clearKey(e) {
   e = e || window.event;
   switch (e.keyCode) {
@@ -316,7 +293,6 @@ function clearKey(e) {
     }
 }
 function keyboardInput() {
-
     keepers[0].dir = keyD ? 1
                     : keyA ? -1
                     : 0;
@@ -324,16 +300,12 @@ function keyboardInput() {
                     : keyS ? -1
                     : 0;
 }
-
-
 // infinitely recursive method that is called to animate the game's visuals
 function animate(ctx)
 {
-
   document.onkeydown = setKey;
   document.onkeyup = clearKey;
   keyboardInput();
-
   // checks if delay is NOT zero
   if(!delay)
   {
@@ -343,24 +315,17 @@ function animate(ctx)
       check_edges();
       check_keepers();
       check_obstacles();
-
   }
   else
     // decreases delay, which is the time before the game starts
       delay--;
-
   update_view(ctx);
-
-
   // request new frame
   requestAnimFrame(function() {
       animate(ctx);
   });
 }
-
-// used to allow 100 miliseconds for the graphics to load for the game, then starts animating
 setTimeout(function() {
     animate(ctx);
 }, 100);
-
 window.onload = init;
